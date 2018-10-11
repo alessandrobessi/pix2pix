@@ -4,8 +4,6 @@ import numpy as np
 from PIL import Image
 from torchvision.transforms import Resize, RandomCrop, RandomHorizontalFlip
 
-from pix2pix.logger import logger
-
 
 class Transform:
 

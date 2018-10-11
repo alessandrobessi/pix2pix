@@ -39,4 +39,6 @@ class FacadesDataset(Dataset):
         real_image = real_image / 127.5 - 1
         input_image = input_image / 127.5 - 1
 
+        input_image = input_image.transpose((2, 0, 1))
+        real_image = real_image.transpose((2, 0, 1))
         return input_image, real_image
