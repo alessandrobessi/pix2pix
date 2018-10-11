@@ -67,9 +67,7 @@ if __name__ == '__main__':
         print("Train Loss: {}".format(float(train_loss.data)))
 
         with torch.no_grad():
-            count = 0
             for input_img, real_img in tqdm(val_loader, desc='Epoch {}'.format(epoch)):
-                count += 1
                 generated_img = generator(input_img)
                 d_judge_generated = discriminator(generated_img, real_img)
                 d_judge_real = discriminator(input_img, real_img)
