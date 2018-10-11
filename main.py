@@ -1,24 +1,33 @@
 import os
 
+from tqdm import tqdm
+from matplotlib import pyplot as plt
+
 import torch
 from torch.utils.data import DataLoader
 
 from pix2pix.datasets import FacadesDataset
 from pix2pix.transforms import Transform
-from pix2pix.logger import logger
 from pix2pix.generator import Generator
 from pix2pix.discriminator import Discriminator
 from pix2pix.losses import generator_loss, discriminator_loss, loss
 
 if __name__ == '__main__':
-    dataset = FacadesDataset(root_dir=os.path.join(os.getcwd(), 'data'),
-                             split='train',
-                             transform=Transform())
+    train_dataset = FacadesDataset(root_dir=os.path.join(os.getcwd(), 'data'),
+                                   split='train',
+                                   transform=Transform())
+    val_dataset = FacadesDataset(root_dir=os.path.join(os.getcwd(), 'data'),
+                                 split='val')
 
-    dataloader = DataLoader(dataset,
-                            batch_size=1,  # Todo: update
+    train_loader = DataLoader(train_dataset,
+                              batch_size=8,
+                              shuffle=True,
+                              num_workers=os.cpu_count())
+
+    val_loader = DataLoader(val_dataset,
+                            batch_size=1,
                             shuffle=True,
-                            num_workers=1)
+                            num_workers=os.cpu_count())
 
     generator = Generator()
     discriminator = Discriminator()
@@ -26,9 +35,10 @@ if __name__ == '__main__':
     g_optim = torch.optim.Adam(generator.parameters(), lr=0.001)
     d_optim = torch.optim.Adam(discriminator.parameters(), lr=0.001)
 
-    total_loss = 0
+    train_loss = 0
+    val_loss = 0
 
-    for input_img, real_img in dataloader:
+    for input_img, real_img in tqdm(train_loader):
         g_optim.zero_grad()
         d_optim.zero_grad()
 
@@ -38,14 +48,32 @@ if __name__ == '__main__':
 
         g_loss = generator_loss(d_judge_generated, generated_img, real_img)
         d_loss = discriminator_loss(d_judge_real, d_judge_generated)
-        total_loss = loss(g_loss, d_loss)
-        total_loss.backward()
+        train_loss = loss(g_loss, d_loss)
+        train_loss.backward()
 
         g_optim.step()
         d_optim.step()
 
-        total_loss += float(total_loss.data)
+        print("Train Loss: {}".format(float(train_loss.data)))
 
-        logger.debug("Loss: {}".format(total_loss))
+    with torch.no_grad():
 
-        break
+        for i, input_img, real_img in enumerate(tqdm(val_loader)):
+            generated_img = generator(input_img)
+            d_judge_generated = discriminator(generated_img, real_img)
+            d_judge_real = discriminator(input_img, real_img)
+
+            g_loss = generator_loss(d_judge_generated, generated_img, real_img)
+            d_loss = discriminator_loss(d_judge_real, d_judge_generated)
+            val_loss = loss(g_loss, d_loss)
+            print("Val Loss: {}".format(float(val_loss.data)))
+
+            if i % 10:
+                plt.imshow(input_img, interpolation='nearest')
+                plt.show()
+
+                plt.imshow(real_img, interpolation='nearest')
+                plt.show()
+
+                plt.imshow(generated_img, interpolation='nearest')
+                plt.show()
