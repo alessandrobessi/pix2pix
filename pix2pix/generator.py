@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from pix2pix.utils import Downsampling, Upsampling
+from pix2pix.ops import Downsampling, Upsampling
 from pix2pix.logger import logger
 
 

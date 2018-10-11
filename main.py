@@ -1,20 +1,24 @@
 import os
 
 from tqdm import tqdm
-from matplotlib import pyplot as plt
 
+import tensorboardX
 import torch
 from torch.utils.data import DataLoader
 
+from pix2pix.logger import logger
 from pix2pix.datasets import FacadesDataset
 from pix2pix.transforms import Transform
 from pix2pix.generator import Generator
 from pix2pix.discriminator import Discriminator
 from pix2pix.losses import generator_loss, discriminator_loss, loss
+from pix2pix.utils import create_working_env
 
 if __name__ == '__main__':
 
-    num_epochs = 1
+    runs_dir, logs_dir = create_working_env()
+
+    num_epochs = 20
 
     train_dataset = FacadesDataset(root_dir=os.path.join(os.getcwd(), 'data'),
                                    split='train',
@@ -41,6 +45,8 @@ if __name__ == '__main__':
     train_loss = 0
     val_loss = 0
 
+    writer = tensorboardX.SummaryWriter(logs_dir)
+
     for epoch in range(num_epochs):
         for input_img, real_img in tqdm(train_loader, desc='Epoch {}'.format(epoch)):
             g_optim.zero_grad()
@@ -58,12 +64,12 @@ if __name__ == '__main__':
             g_optim.step()
             d_optim.step()
 
-            print("Train Loss: {}".format(float(train_loss.data)))
+        print("Train Loss: {}".format(float(train_loss.data)))
 
         with torch.no_grad():
-
-            for i, input_img, real_img in enumerate(tqdm(val_loader,
-                                                         desc='Epoch {}'.format(epoch))):
+            count = 0
+            for input_img, real_img in tqdm(val_loader, desc='Epoch {}'.format(epoch)):
+                count += 1
                 generated_img = generator(input_img)
                 d_judge_generated = discriminator(generated_img, real_img)
                 d_judge_real = discriminator(input_img, real_img)
@@ -71,14 +77,11 @@ if __name__ == '__main__':
                 g_loss = generator_loss(d_judge_generated, generated_img, real_img)
                 d_loss = discriminator_loss(d_judge_real, d_judge_generated)
                 val_loss = loss(g_loss, d_loss)
-                print("Val Loss: {}".format(float(val_loss.data)))
 
-                if i % 10:
-                    plt.imshow(input_img, interpolation='nearest')
-                    plt.show()
+        print("Val Loss: {}".format(float(val_loss.data)))
 
-                    plt.imshow(real_img, interpolation='nearest')
-                    plt.show()
+        writer.add_scalar('train_loss', float(train_loss.data), epoch)
+        writer.add_scalar('val_loss', float(val_loss.data), epoch)
 
-                    plt.imshow(generated_img, interpolation='nearest')
-                    plt.show()
+        checkpoint_path = os.path.join(runs_dir, 'checkpoint_{}'.format(epoch))
+        torch.save(generator.state_dict(), checkpoint_path)
