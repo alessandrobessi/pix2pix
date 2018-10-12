@@ -28,7 +28,7 @@ if __name__ == '__main__':
                                  split='val')
 
     train_loader = DataLoader(train_dataset,
-                              batch_size=8,
+                              batch_size=4,
                               shuffle=True,
                               num_workers=os.cpu_count())
 
@@ -40,8 +40,8 @@ if __name__ == '__main__':
     generator = Generator()
     discriminator = Discriminator()
 
-    g_optim = torch.optim.Adam(generator.parameters(), lr=0.001)
-    d_optim = torch.optim.Adam(discriminator.parameters(), lr=0.001)
+    g_optim = torch.optim.Adam(generator.parameters(), lr=0.0001)
+    d_optim = torch.optim.Adam(discriminator.parameters(), lr=0.0001)
 
     writer = tensorboardX.SummaryWriter(logs_dir)
 
@@ -91,5 +91,5 @@ if __name__ == '__main__':
         writer.add_scalar('train_loss', total_train_loss // step, epoch)
         writer.add_scalar('val_loss', total_val_loss // step, epoch)
 
-        checkpoint_path = os.path.join(runs_dir, 'checkpoint'.format(epoch))
+        checkpoint_path = os.path.join(runs_dir, 'checkpoint_{}'.format(epoch))
         torch.save(generator.state_dict(), checkpoint_path)

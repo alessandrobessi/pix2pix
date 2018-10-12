@@ -10,7 +10,7 @@ from pix2pix.logger import logger
 def generator_loss(discriminator_judgement: Tensor,
                    generated_image: Tensor,
                    real_image: Tensor,
-                   correction: int = 100) -> Tensor:
+                   multiplier: int = 100) -> Tensor:
     bce = nn.BCELoss()
     l1 = nn.L1Loss()
     # noinspection PyUnresolvedReferences
@@ -20,7 +20,7 @@ def generator_loss(discriminator_judgement: Tensor,
                    torch.ones(discriminator_judgement.size()))
     l1_loss = l1(real_image, generated_image)
 
-    return gan_loss + correction * l1_loss
+    return gan_loss + multiplier * l1_loss
 
 
 def discriminator_loss(real_image: Tensor, generated_image: Tensor) -> Tensor:
