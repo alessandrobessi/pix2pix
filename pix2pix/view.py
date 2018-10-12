@@ -1,9 +1,8 @@
 import os
 from typing import Tuple
 
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 import torch
 from torch import Tensor
 
@@ -21,5 +20,7 @@ def save_image(images: Tuple, examples_dir: str, epoch: int) -> None:
     images = [tensor_to_array(image) for image in images]
     img = np.concatenate(images, axis=1)
     plt.imshow(img, interpolation='nearest')
+    plt.xticks([])
+    plt.yticks([])
     file_path = os.path.join(examples_dir, 'epoch_{}.png'.format(epoch))
     plt.savefig(file_path, dpi=300)
