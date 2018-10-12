@@ -3,3 +3,4 @@ numpy>=1.14.5
 torchvision>=0.2.1
 torch>=0.4.1
 Pillow>=4.3.0
+matplotlib>=2.1.2
