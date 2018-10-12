@@ -84,9 +84,7 @@ if __name__ == '__main__':
 
                 total_val_loss += float(val_loss.data)
 
-        save_image(generated_img, examples_dir, 'generated', epoch)
-        save_image(input_img, examples_dir, 'input', epoch)
-        save_image(real_img, examples_dir, 'real', epoch)
+        save_image([input_img, real_img, generated_img], examples_dir, epoch)
 
         logger.info("Val Loss: {}".format(total_val_loss // step))
 

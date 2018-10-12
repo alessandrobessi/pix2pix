@@ -1,7 +1,10 @@
 import os
+from typing import Tuple
+
 import numpy as np
 import matplotlib.pyplot as plt
 
+import torch
 from torch import Tensor
 
 
@@ -14,8 +17,9 @@ def tensor_to_array(t: Tensor) -> np.ndarray:
     return np.uint8(img)
 
 
-def save_image(t: Tensor, examples_dir: str, name: str, epoch: int) -> None:
-    a = tensor_to_array(t)
-    plt.imshow(a, interpolation='nearest')
-    file_path = os.path.join(examples_dir, 'epoch_{}_{}.png'.format(epoch, name))
+def save_image(images: Tuple, examples_dir: str, epoch: int) -> None:
+    images = [tensor_to_array(image) for image in images]
+    img = np.concatenate(images, axis=1)
+    plt.imshow(img, interpolation='nearest')
+    file_path = os.path.join(examples_dir, 'epoch_{}.png'.format(epoch))
     plt.savefig(file_path, dpi=300)
