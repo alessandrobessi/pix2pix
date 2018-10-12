@@ -1,17 +1,16 @@
 import os
 
-from tqdm import tqdm
-
 import tensorboardX
 import torch
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
-from pix2pix.logger import logger
 from pix2pix.datasets import FacadesDataset
-from pix2pix.transforms import Transform
-from pix2pix.generator import Generator
 from pix2pix.discriminator import Discriminator
+from pix2pix.generator import Generator
+from pix2pix.logger import logger
 from pix2pix.losses import generator_loss, discriminator_loss, loss
+from pix2pix.transforms import Transform
 from pix2pix.utils import create_working_env
 from pix2pix.view import save_image
 
@@ -86,10 +85,10 @@ if __name__ == '__main__':
 
         save_image([input_img, real_img, generated_img], examples_dir, epoch)
 
-        logger.info("Val Loss: {}".format(total_val_loss // step))
+        logger.info("Val Loss: {}".format(total_val_loss / step))
 
-        writer.add_scalar('train_loss', total_train_loss // step, epoch)
-        writer.add_scalar('val_loss', total_val_loss // step, epoch)
+        writer.add_scalar('train_loss', total_train_loss / step, epoch)
+        writer.add_scalar('val_loss', total_val_loss / step, epoch)
 
         checkpoint_path = os.path.join(runs_dir, 'checkpoint_{}'.format(epoch))
         torch.save(generator.state_dict(), checkpoint_path)
