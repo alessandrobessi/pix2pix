@@ -18,7 +18,7 @@ if __name__ == '__main__':
     data_dir, runs_dir, logs_dir, examples_dir = create_working_env()
 
     num_epochs = 100
-    lr = 0.0002
+    lr = 0.0001
 
     train_dataset = FacadesDataset(data_dir=data_dir,
                                    split='train',
