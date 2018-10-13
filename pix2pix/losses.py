@@ -1,26 +1,24 @@
-import numpy as np
-
 import torch
 import torch.nn as nn
 from torch import Tensor
 
-from pix2pix.logger import logger
 
-
-def generator_loss(discriminator_judgement: Tensor,
-                   generated_image: Tensor,
-                   real_image: Tensor,
-                   multiplier: int = 100) -> Tensor:
+def generator_loss_gan(discriminator_judgement: Tensor) -> Tensor:
     bce = nn.BCELoss()
-    l1 = nn.L1Loss()
     # noinspection PyUnresolvedReferences
     discriminator_judgement = discriminator_judgement.view(-1, 30 * 30)
     # noinspection PyUnresolvedReferences
     gan_loss = bce(discriminator_judgement,
                    torch.ones(discriminator_judgement.size()))
-    l1_loss = l1(real_image, generated_image)
+    return gan_loss
 
-    return gan_loss + multiplier * l1_loss
+
+def generator_loss_l1(real_image: Tensor,
+                      generated_image: Tensor,
+                      multiplier: int = 100) -> Tensor:
+    # noinspection PyUnresolvedReferences
+    l1_loss = torch.mean(torch.abs(real_image - generated_image))
+    return l1_loss * multiplier
 
 
 def discriminator_loss(real_image: Tensor, generated_image: Tensor) -> Tensor:
@@ -35,5 +33,7 @@ def discriminator_loss(real_image: Tensor, generated_image: Tensor) -> Tensor:
     return real_loss + generated_loss
 
 
-def loss(generator_loss: Tensor, discriminator_loss: Tensor) -> Tensor:
-    return generator_loss + discriminator_loss
+def loss(generator_loss_l1: Tensor,
+         generator_loss_gan: Tensor,
+         discriminator_loss: Tensor) -> Tensor:
+    return generator_loss_l1 + generator_loss_gan + discriminator_loss

@@ -3,7 +3,7 @@ import time
 from typing import Tuple
 
 
-def create_working_env() -> Tuple[str, str, str]:
+def create_working_env() -> Tuple[str, str, str, str]:
     for d in ('runs', 'logs', 'examples'):
         if not os.path.exists(os.path.join(os.getcwd(), d)):
             os.makedirs(os.path.join(os.getcwd(), d))
@@ -19,4 +19,6 @@ def create_working_env() -> Tuple[str, str, str]:
     examples_dir = os.path.join(os.getcwd(), 'examples', now)
     os.makedirs(examples_dir)
 
-    return runs_dir, logs_dir, examples_dir
+    data_dir = os.path.join(os.getcwd(), 'data')
+
+    return data_dir, runs_dir, logs_dir, examples_dir

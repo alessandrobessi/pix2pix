@@ -1,10 +1,8 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-import torch
 from torch import Tensor
 from torch.nn.modules import BatchNorm2d, Dropout2d
-from pix2pix.logger import logger
 
 
 class Downsampling(nn.Module):
@@ -20,7 +18,7 @@ class Downsampling(nn.Module):
         x = F.max_pool2d(F.pad(self.conv2d(x), pad=(2, 2, 2, 2)), kernel_size=(2, 2))
         if self.batchnorm:
             x = self.batchnorm(x)
-        return F.leaky_relu(x)
+        return F.leaky_relu(x, 0.2)
 
 
 class Upsampling(nn.Module):

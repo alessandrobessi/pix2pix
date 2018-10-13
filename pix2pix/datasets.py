@@ -5,20 +5,18 @@ import cv2
 import numpy as np
 from torch.utils.data import Dataset
 
-from pix2pix.logger import logger
-
 
 class FacadesDataset(Dataset):
 
     def __init__(self,
-                 root_dir: str,
+                 data_dir: str,
                  split: str,
                  transform: Optional[Callable[[np.ndarray, np.ndarray],
                                               Tuple[np.ndarray, np.ndarray]]] = None):
-        self.root_dir = os.path.expanduser(os.path.normpath(root_dir))
+        self.data_dir = os.path.expanduser(os.path.normpath(data_dir))
         self.split = split
         self.transform = transform
-        self.images_path = os.path.join(self.root_dir, self.split)
+        self.images_path = os.path.join(self.data_dir, self.split)
         self.images_list = [f for f in os.listdir(self.images_path)
                             if os.path.isfile(os.path.join(self.images_path, f))]
 
