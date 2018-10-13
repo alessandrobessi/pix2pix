@@ -18,7 +18,7 @@ if __name__ == '__main__':
     data_dir, runs_dir, logs_dir, examples_dir = create_working_env()
 
     num_epochs = 100
-    lr = 0.0005
+    lr = 0.0002
 
     train_dataset = FacadesDataset(data_dir=data_dir,
                                    split='train',
@@ -55,23 +55,24 @@ if __name__ == '__main__':
         for input_img, real_img in tqdm(train_loader, desc='Epoch {}'.format(epoch)):
             step += 1
 
+            # generator update
+            g_optim.zero_grad()
+
             generated_img = generator(input_img)
             d_judge_generated = discriminator(generated_img, real_img)
             d_judge_real = discriminator(input_img, real_img)
 
-            # discriminator update
-            d_optim.zero_grad()
-            d_loss = discriminator_loss(d_judge_real, d_judge_generated)
-            d_loss.backward(retain_graph=True)
-            d_optim.step()
-
-            # generator update
-            g_optim.zero_grad()
             g_loss_l1 = generator_loss_l1(real_img, generated_img)
             g_loss_gan = generator_loss_gan(d_judge_generated)
             g_loss = g_loss_l1 + g_loss_gan
             g_loss.backward()
             g_optim.step()
+
+            # discriminator update
+            d_optim.zero_grad()
+            d_loss = discriminator_loss(d_judge_real, d_judge_generated.detach())
+            d_loss.backward()
+            d_optim.step()
 
             writer.add_scalar('generator_loss_l1', float(g_loss_l1.data), step)
             writer.add_scalar('generator_loss_gan', float(g_loss_gan.data), step)
