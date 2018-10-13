@@ -55,13 +55,12 @@ if __name__ == '__main__':
         for input_img, real_img in tqdm(train_loader, desc='Epoch {}'.format(epoch)):
             step += 1
 
-            # generator update
-            g_optim.zero_grad()
-
             generated_img = generator(input_img)
             d_judge_generated = discriminator(generated_img, real_img)
             d_judge_real = discriminator(input_img, real_img)
 
+            # generator update
+            g_optim.zero_grad()
             g_loss_l1 = generator_loss_l1(real_img, generated_img)
             g_loss_gan = generator_loss_gan(d_judge_generated)
             g_loss = g_loss_l1 + g_loss_gan
