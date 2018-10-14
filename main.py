@@ -55,9 +55,9 @@ if __name__ == '__main__':
             # generator update
             g_optim.zero_grad()
             generated_img = generator(input_img)
-            d_judge_generated = discriminator(generated_img, real_img)
+            d_judge_generated = discriminator(generated_img, real_img).detach()
             g_loss_l1 = generator_loss_l1(real_img, generated_img)
-            g_loss_gan = generator_loss_gan(d_judge_generated.detach())
+            g_loss_gan = generator_loss_gan(d_judge_generated)
             g_loss = g_loss_l1 + g_loss_gan
             g_loss.backward()
             g_optim.step()
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
             writer.add_scalar('generator_loss_l1', float(g_loss_l1.data), step)
             writer.add_scalar('generator_loss_gan', float(g_loss_gan.data), step)
-            writer.add_scalar('generator_loss_gan_l1', float(g_loss_gan.data), step)
+            writer.add_scalar('generator_loss_total', float(g_loss_gan.data), step)
             writer.add_scalar('discriminator_loss', float(d_loss.data), step)
 
         with torch.no_grad():

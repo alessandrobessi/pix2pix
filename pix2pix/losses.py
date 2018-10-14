@@ -30,7 +30,7 @@ def discriminator_loss(real_image: Tensor, generated_image: Tensor) -> Tensor:
     # noinspection PyUnresolvedReferences
     generated_loss = bce(generated_image, torch.zeros(generated_image.shape))
 
-    return real_loss + generated_loss
+    return (real_loss + generated_loss) / 2
 
 
 def loss(generator_loss_l1: Tensor,
