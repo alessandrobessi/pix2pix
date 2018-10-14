@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
             writer.add_scalar('generator_loss_l1', float(g_loss_l1.data), step)
             writer.add_scalar('generator_loss_gan', float(g_loss_gan.data), step)
-            writer.add_scalar('generator_loss_total', float(g_loss_gan.data), step)
+            writer.add_scalar('generator_loss_total', float(g_loss.data), step)
             writer.add_scalar('discriminator_loss', float(d_loss.data), step)
 
         with torch.no_grad():
