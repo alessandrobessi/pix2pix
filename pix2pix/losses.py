@@ -9,8 +9,7 @@ def generator_loss_gan(discriminator_judgement: Tensor,
     # noinspection PyUnresolvedReferences
     discriminator_judgement = discriminator_judgement.view(-1, 30 * 30)
     # noinspection PyUnresolvedReferences
-    gan_loss = bce(discriminator_judgement,
-                   torch.ones(discriminator_judgement.size()))
+    gan_loss = bce(discriminator_judgement, torch.ones(discriminator_judgement.shape))
     return gan_loss * gan_weight
 
 
