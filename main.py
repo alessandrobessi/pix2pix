@@ -46,8 +46,6 @@ if __name__ == '__main__':
 
     step = 0
     for epoch in range(num_epochs):
-        # g_scheduler.step()
-        # d_scheduler.step()
 
         for input_img, real_img in tqdm(train_loader, desc='Epoch {}'.format(epoch)):
             step += 1
