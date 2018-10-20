@@ -8,7 +8,7 @@ from tqdm import tqdm
 from pix2pix.datasets import FacadesDataset
 from pix2pix.discriminator import Discriminator
 from pix2pix.generator import Generator
-from pix2pix.losses import generator_loss_l1, generator_loss_gan, discriminator_loss, loss
+from pix2pix.losses import generator_loss_l1, generator_loss_gan, discriminator_loss
 from pix2pix.transforms import Transform
 from pix2pix.utils import create_working_env
 from pix2pix.view import tensor_to_image
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     num_epochs = 100
     lr = 0.0002
-    discriminator_steps = 50
+    discriminator_steps = 100
 
     train_dataset = FacadesDataset(data_dir=data_dir,
                                    split='train',
