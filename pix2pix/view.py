@@ -7,6 +7,14 @@ import torch
 from torch import Tensor
 
 
+def tensor_to_image(t: Tensor) -> Tensor:
+    # noinspection PyUnresolvedReferences
+    t = torch.squeeze(t)
+    img = (t.detach() + 1) * 127.5
+    # noinspection PyUnresolvedReferences
+    return img.type(torch.ByteTensor)
+
+
 def tensor_to_array(t: Tensor) -> np.ndarray:
     t = t.permute(0, 2, 3, 1)
     # noinspection PyUnresolvedReferences

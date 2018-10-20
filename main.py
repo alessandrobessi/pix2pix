@@ -11,7 +11,7 @@ from pix2pix.generator import Generator
 from pix2pix.losses import generator_loss_l1, generator_loss_gan, discriminator_loss, loss
 from pix2pix.transforms import Transform
 from pix2pix.utils import create_working_env
-from pix2pix.view import save_image
+from pix2pix.view import tensor_to_image
 
 if __name__ == '__main__':
 
@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
     num_epochs = 100
     lr = 0.0002
+    discriminator_steps = 50
 
     train_dataset = FacadesDataset(data_dir=data_dir,
                                    split='train',
@@ -53,25 +54,27 @@ if __name__ == '__main__':
             # generator update
             g_optim.zero_grad()
             generated_img = generator(input_img)
-            d_judge_generated = discriminator(generated_img, real_img).detach()
+            d_judge_generated = discriminator(generated_img, real_img)
             g_loss_l1 = generator_loss_l1(real_img, generated_img)
-            g_loss_gan = generator_loss_gan(d_judge_generated)
-            g_loss = g_loss_l1 + g_loss_gan
+            g_loss_gan = generator_loss_gan(d_judge_generated.detach())
+            g_loss = 0.5 * g_loss_l1 + 0.5 * g_loss_gan
             g_loss.backward()
             g_optim.step()
 
-            # discriminator update
-            d_optim.zero_grad()
-            d_judge_generated = discriminator(generated_img.detach(), real_img)
-            d_judge_real = discriminator(input_img, real_img)
-            d_loss = discriminator_loss(d_judge_real, d_judge_generated)
-            d_loss.backward()
-            d_optim.step()
+            writer.add_scalar('training/generator_loss_l1', float(g_loss_l1.item()), step)
+            writer.add_scalar('training/generator_loss_gan', float(g_loss_gan.item()), step)
+            writer.add_scalar('training/generator_loss_total', float(g_loss.item()), step)
 
-            writer.add_scalar('generator_loss_l1', float(g_loss_l1.data), step)
-            writer.add_scalar('generator_loss_gan', float(g_loss_gan.data), step)
-            writer.add_scalar('generator_loss_total', float(g_loss.data), step)
-            writer.add_scalar('discriminator_loss', float(d_loss.data), step)
+            if step % discriminator_steps == 0:
+                # discriminator update
+                d_optim.zero_grad()
+                d_judge_generated = discriminator(generated_img.detach(), real_img)
+                d_judge_real = discriminator(input_img, real_img)
+                d_loss = discriminator_loss(d_judge_real, d_judge_generated)
+                d_loss.backward()
+                d_optim.step()
+
+                writer.add_scalar('training/discriminator_loss', float(d_loss.data), step)
 
         with torch.no_grad():
             for input_img, real_img in tqdm(val_loader, desc='Epoch {}'.format(epoch)):
@@ -81,12 +84,19 @@ if __name__ == '__main__':
 
                 g_loss_l1 = generator_loss_l1(real_img, generated_img)
                 g_loss_gan = generator_loss_gan(d_judge_generated)
+                g_loss_total = 0.5 * g_loss_l1 + 0.5 * g_loss_gan
                 d_loss = discriminator_loss(d_judge_real, d_judge_generated)
-                val_loss = loss(g_loss_l1, g_loss_gan, d_loss)
 
-        writer.add_scalar('val_loss', float(val_loss.data), step)
+        writer.add_scalar('validation/generator_loss_l1', float(g_loss_l1.item()), step)
+        writer.add_scalar('validation/generator_loss_gan', float(g_loss_gan.item()), step)
+        writer.add_scalar('validation/generator_loss_total', float(g_loss_total.item()), step)
+        writer.add_scalar('validation/discriminator_loss', float(d_loss.item()), step)
 
-        save_image([input_img, real_img, generated_img], examples_dir, epoch)
+        writer.add_image('step_{}/input'.format(epoch), tensor_to_image(input_img))
+        writer.add_image('step_{}/real'.format(epoch), tensor_to_image(real_img))
+        writer.add_image('step_{}/generated'.format(epoch), tensor_to_image(generated_img))
+
+        # save_image([input_img, real_img, generated_img], examples_dir, epoch)
 
         checkpoint_path = os.path.join(runs_dir, 'checkpoint_{}'.format(epoch))
         torch.save(generator.state_dict(), checkpoint_path)
