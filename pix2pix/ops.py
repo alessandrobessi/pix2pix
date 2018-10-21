@@ -36,7 +36,7 @@ class Upsampling(nn.Module):
                                                    kernel_size=(2, 2), stride=2)
 
     def forward(self, x, corresponding_layer):
-        x = self.conv2d_transpose(x)
+        x = F.relu(self.conv2d_transpose(x))
         if self.dropout:
             x = self.dropout(x)
         # noinspection PyUnresolvedReferences

@@ -22,11 +22,11 @@ class Discriminator(nn.Module):
         # noinspection PyUnresolvedReferences
         xy = torch.cat([x, y], dim=1)
 
-        x1 = self.downsample_1(xy)
-        x2 = self.downsample_2(x1)
-        x3 = self.downsample_3(x2)
+        x1 = F.relu(self.downsample_1(xy))
+        x2 = F.relu(self.downsample_2(x1))
+        x3 = F.relu(self.downsample_3(x2))
         x4 = F.pad(x3, pad=(1, 1, 1, 1))
-        x5 = self.conv2d_1(x4)
+        x5 = F.relu(self.conv2d_1(x4))
         x6 = F.pad(x5, pad=(1, 1, 1, 1))
-        x7 = self.conv2d_2(x6)
+        x7 = F.relu(self.conv2d_2(x6))
         return self.sigmoid(x7)
