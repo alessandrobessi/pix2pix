@@ -92,9 +92,9 @@ if __name__ == '__main__':
         writer.add_scalar('validation/generator_loss_total', float(g_loss_total.item()), step)
         writer.add_scalar('validation/discriminator_loss', float(d_loss.item()), step)
 
-        writer.add_image('step_{}/input'.format(epoch), tensor_to_image(input_img))
-        writer.add_image('step_{}/real'.format(epoch), tensor_to_image(real_img))
-        writer.add_image('step_{}/generated'.format(epoch), tensor_to_image(generated_img))
+        writer.add_image('step_{}/input'.format(epoch), tensor_to_image(input_img), epoch)
+        writer.add_image('step_{}/real'.format(epoch), tensor_to_image(real_img), epoch)
+        writer.add_image('step_{}/generated'.format(epoch), tensor_to_image(generated_img), epoch)
 
         # save_image([input_img, real_img, generated_img], examples_dir, epoch)
 
