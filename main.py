@@ -56,7 +56,7 @@ if __name__ == '__main__':
             generated_img = generator(input_img)
             d_judge_generated = discriminator(generated_img, real_img)
             g_loss_l1 = generator_loss_l1(real_img, generated_img)
-            g_loss_gan = generator_loss_gan(d_judge_generated.detach())
+            g_loss_gan = generator_loss_gan(d_judge_generated)
             g_loss = 0.5 * g_loss_l1 + 0.5 * g_loss_gan
             g_loss.backward()
             g_optim.step()

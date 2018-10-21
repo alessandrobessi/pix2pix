@@ -16,9 +16,8 @@ def generator_loss_gan(discriminator_judgement: Tensor,
 def generator_loss_l1(real_image: Tensor,
                       generated_image: Tensor,
                       l1_weight: int = 1) -> Tensor:
-    l1 = nn.L1Loss()
     # noinspection PyUnresolvedReferences
-    l1_loss = l1(real_image, generated_image)
+    l1_loss = torch.mean(torch.abs(real_image - generated_image))
     return l1_loss * l1_weight
 
 

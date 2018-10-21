@@ -16,13 +16,15 @@ class Generator(nn.Module):
         self.downsample_5 = Downsampling(in_channels=512, out_channels=512)
         self.downsample_6 = Downsampling(in_channels=512, out_channels=512)
         self.downsample_7 = Downsampling(in_channels=512, out_channels=512)
+        self.downsample_8 = Downsampling(in_channels=512, out_channels=512, bottleneck=True)
 
         self.upsample_1 = Upsampling(in_channels=512, out_channels=512, dropout=True)
         self.upsample_2 = Upsampling(in_channels=1024, out_channels=512, dropout=True)
         self.upsample_3 = Upsampling(in_channels=1024, out_channels=512, dropout=True)
-        self.upsample_4 = Upsampling(in_channels=1024, out_channels=256)
-        self.upsample_5 = Upsampling(in_channels=512, out_channels=128)
-        self.upsample_6 = Upsampling(in_channels=256, out_channels=64)
+        self.upsample_4 = Upsampling(in_channels=1024, out_channels=512)
+        self.upsample_5 = Upsampling(in_channels=1024, out_channels=256)
+        self.upsample_6 = Upsampling(in_channels=512, out_channels=128)
+        self.upsample_7 = Upsampling(in_channels=256, out_channels=64)
 
         self.last = nn.ConvTranspose2d(128, 3, kernel_size=(2, 2), stride=2)
 
@@ -34,13 +36,15 @@ class Generator(nn.Module):
         x5 = self.downsample_5(x4)
         x6 = self.downsample_6(x5)
         x7 = self.downsample_7(x6)
+        x8 = self.downsample_8(x7)
 
-        x8 = self.upsample_1(x7, x6)
-        x9 = self.upsample_2(x8, x5)
-        x10 = self.upsample_3(x9, x4)
-        x11 = self.upsample_4(x10, x3)
-        x12 = self.upsample_5(x11, x2)
-        x13 = self.upsample_6(x12, x1)
+        x9 = self.upsample_1(x8, x7)
+        x10 = self.upsample_2(x9, x6)
+        x11 = self.upsample_3(x10, x5)
+        x12 = self.upsample_4(x11, x4)
+        x13 = self.upsample_5(x12, x3)
+        x14 = self.upsample_6(x13, x2)
+        x15 = self.upsample_7(x14, x1)
         # noinspection PyUnresolvedReferences
-        x14 = torch.tanh(self.last(x13))
-        return x14
+        x16 = torch.tanh(self.last(x15))
+        return x16
