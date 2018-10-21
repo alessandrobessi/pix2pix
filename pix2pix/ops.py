@@ -24,7 +24,7 @@ class Downsampling(nn.Module):
         x = F.max_pool2d(F.pad(self.conv2d(x), pad=self.pad), kernel_size=(2, 2))
         if self.batchnorm and not self.bottleneck:
             x = self.batchnorm(x)
-        return F.leaky_relu(x, 0.2)
+        return F.relu(x)
 
 
 class Upsampling(nn.Module):

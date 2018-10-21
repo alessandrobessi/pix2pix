@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     num_epochs = 100
     lr = 0.0002
-    discriminator_steps = 10
+    discriminator_steps = 2
 
     train_dataset = FacadesDataset(data_dir=data_dir,
                                    split='train',
@@ -47,7 +47,8 @@ if __name__ == '__main__':
 
     step = 0
     for epoch in range(num_epochs):
-
+        generator.train()
+        discriminator.train()
         for input_img, real_img in tqdm(train_loader, desc='Epoch {}'.format(epoch)):
             step += 1
 
@@ -57,7 +58,7 @@ if __name__ == '__main__':
             d_judge_generated = discriminator(generated_img, real_img)
             g_loss_l1 = generator_loss_l1(real_img, generated_img)
             g_loss_gan = generator_loss_gan(d_judge_generated)
-            g_loss = 0.5 * g_loss_l1 + 0.5 * g_loss_gan
+            g_loss = g_loss_l1 + g_loss_gan
             g_loss.backward()
             g_optim.step()
 
@@ -77,6 +78,8 @@ if __name__ == '__main__':
                 writer.add_scalar('training/discriminator_loss', float(d_loss.data), step)
 
         with torch.no_grad():
+            generator.eval()
+            discriminator.eval()
             for input_img, real_img in tqdm(val_loader, desc='Epoch {}'.format(epoch)):
                 generated_img = generator(input_img)
                 d_judge_generated = discriminator(generated_img, real_img)
@@ -84,7 +87,7 @@ if __name__ == '__main__':
 
                 g_loss_l1 = generator_loss_l1(real_img, generated_img)
                 g_loss_gan = generator_loss_gan(d_judge_generated)
-                g_loss_total = 0.5 * g_loss_l1 + 0.5 * g_loss_gan
+                g_loss_total = g_loss_l1 + g_loss_gan
                 d_loss = discriminator_loss(d_judge_real, d_judge_generated)
 
         writer.add_scalar('validation/generator_loss_l1', float(g_loss_l1.item()), step)

@@ -9,24 +9,25 @@ from pix2pix.logger import logger
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
-        self.downsample_1 = Downsampling(in_channels=3, out_channels=64, batchnorm=False)
-        self.downsample_2 = Downsampling(in_channels=64, out_channels=128)
-        self.downsample_3 = Downsampling(in_channels=128, out_channels=256)
-        self.downsample_4 = Downsampling(in_channels=256, out_channels=512)
-        self.downsample_5 = Downsampling(in_channels=512, out_channels=512)
-        self.downsample_6 = Downsampling(in_channels=512, out_channels=512)
-        self.downsample_7 = Downsampling(in_channels=512, out_channels=512)
-        self.downsample_8 = Downsampling(in_channels=512, out_channels=512, bottleneck=True)
+        f = 2
+        self.downsample_1 = Downsampling(in_channels=3, out_channels=64 * f, batchnorm=False)
+        self.downsample_2 = Downsampling(in_channels=64 * f, out_channels=128 * f)
+        self.downsample_3 = Downsampling(in_channels=128 * f, out_channels=256 * f)
+        self.downsample_4 = Downsampling(in_channels=256 * f, out_channels=512 * f)
+        self.downsample_5 = Downsampling(in_channels=512 * f, out_channels=512 * f)
+        self.downsample_6 = Downsampling(in_channels=512 * f, out_channels=512 * f)
+        self.downsample_7 = Downsampling(in_channels=512 * f, out_channels=512 * f)
+        self.downsample_8 = Downsampling(in_channels=512 * f, out_channels=512 * f, bottleneck=True)
 
-        self.upsample_1 = Upsampling(in_channels=512, out_channels=512, dropout=True)
-        self.upsample_2 = Upsampling(in_channels=1024, out_channels=512, dropout=True)
-        self.upsample_3 = Upsampling(in_channels=1024, out_channels=512, dropout=True)
-        self.upsample_4 = Upsampling(in_channels=1024, out_channels=512)
-        self.upsample_5 = Upsampling(in_channels=1024, out_channels=256)
-        self.upsample_6 = Upsampling(in_channels=512, out_channels=128)
-        self.upsample_7 = Upsampling(in_channels=256, out_channels=64)
+        self.upsample_1 = Upsampling(in_channels=512 * f, out_channels=512 * f, dropout=True)
+        self.upsample_2 = Upsampling(in_channels=1024 * f, out_channels=512 * f, dropout=True)
+        self.upsample_3 = Upsampling(in_channels=1024 * f, out_channels=512 * f, dropout=True)
+        self.upsample_4 = Upsampling(in_channels=1024 * f, out_channels=512 * f)
+        self.upsample_5 = Upsampling(in_channels=1024 * f, out_channels=256 * f)
+        self.upsample_6 = Upsampling(in_channels=512 * f, out_channels=128 * f)
+        self.upsample_7 = Upsampling(in_channels=256 * f, out_channels=64 * f)
 
-        self.last = nn.ConvTranspose2d(128, 3, kernel_size=(2, 2), stride=2)
+        self.last = nn.ConvTranspose2d(128 * f, 3, kernel_size=(2, 2), stride=2)
 
     def forward(self, x: Tensor):
         x1 = self.downsample_1(x)
