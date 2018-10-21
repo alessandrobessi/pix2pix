@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     num_epochs = 100
     lr = 0.0002
-    discriminator_steps = 100
+    discriminator_steps = 10
 
     train_dataset = FacadesDataset(data_dir=data_dir,
                                    split='train',
