@@ -9,7 +9,7 @@ from pix2pix.logger import logger
 class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
-        f = 2
+        f = 1
         self.downsample_1 = Downsampling(in_channels=3, out_channels=64 * f, batchnorm=False)
         self.downsample_2 = Downsampling(in_channels=64 * f, out_channels=128 * f)
         self.downsample_3 = Downsampling(in_channels=128 * f, out_channels=256 * f)
